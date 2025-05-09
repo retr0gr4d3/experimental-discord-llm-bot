@@ -1,0 +1,34 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Bot Interaction Patterns
+
+## Message Handling
+The bot responds to two types of interactions:
+1. Direct mentions (@bot_name)
+2. Replies to bot messages
+
+## Response Format
+- Regular responses are sent as standard Discord messages
+- Error responses use Discord embeds with:
+  - Title: Error
+  - Description: "I can't think straight right now. Please try again later, or tell Retr0gr4d3 to wake me up"
+  - Footer: Link to https://retr0.gr4d3.uk/
+
+## Message Processing Flow
+1. Message received
+2. Check if message is a mention or reply
+3. Extract user message content
+4. Process through LLM backend
+5. Send response or error message
+
+## Error Handling
+The bot implements error handling for:
+- API connection failures
+- Invalid responses
+- Rate limiting
+- Authentication errors
+
+All errors should be logged for debugging purposes while maintaining user-friendly error messages.

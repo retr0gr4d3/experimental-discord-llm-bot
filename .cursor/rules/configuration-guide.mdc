@@ -1,0 +1,46 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Configuration Guide
+
+## Required Configuration Files
+
+### 1. Environment Variables (.env)
+The bot requires the following environment variables:
+```
+DISCORD_TOKEN=your_discord_bot_token
+LLM_API_KEY=your_llm_api_key
+LLM_SERVER_URL=your_llm_server_url
+```
+
+### 2. Character Configuration (character.json)
+The character.json file should follow the Chub AI format and contain:
+- Character name
+- Personality traits
+- Example conversations
+- System prompts
+- Other character-specific settings
+
+Example structure:
+```json
+{
+    "name": "Character Name",
+    "personality": "Character personality description",
+    "scenario": "Context for the character",
+    "first_mes": "Initial greeting message",
+    "mes_example": "Example conversation format"
+}
+```
+
+## Configuration Management
+The [config.py](mdc:config.py) file handles:
+- Loading environment variables
+- Validating configuration
+- Providing configuration access to other modules
+
+## Security Notes
+- Never commit .env files to version control
+- Keep API keys and tokens secure
+- Use environment variables for sensitive data

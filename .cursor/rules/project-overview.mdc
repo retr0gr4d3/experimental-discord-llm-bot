@@ -1,0 +1,32 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Discord LLM Bot Project Overview
+
+This project implements a Discord bot that interfaces with various LLM backends (OpenAI-compatible APIs, KoboldCPP, Ollama) to provide AI chat capabilities in Discord servers.
+
+## Core Features
+- Direct interaction with users through mentions and replies
+- Configurable LLM character profiles via character.json
+- Support for multiple LLM backends
+- Error handling with user-friendly messages
+
+## Key Components
+- [main.py](mdc:main.py) - Main bot entry point
+- [config.py](mdc:config.py) - Configuration management
+- [character.json](mdc:character.json) - LLM character configuration
+- [requirements.txt](mdc:requirements.txt) - Project dependencies
+
+## Configuration
+The bot requires the following configuration:
+1. Discord Bot Token
+2. LLM API Key
+3. LLM Server Address
+4. Character Profile (character.json)
+
+## Error Handling
+When the LLM API is inaccessible, the bot will respond with an embedded message containing:
+- Error message: "I can't think straight right now. Please try again later, or tell Retr0gr4d3 to wake me up!"
+- Footer link: https://retr0.gr4d3.uk/

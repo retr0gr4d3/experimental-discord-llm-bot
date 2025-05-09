@@ -1,0 +1,49 @@
+# Discord LLM Bot Configuration
+
+# Discord settings
+discord:
+  # Leave empty to use value from .env file
+  token: ""
+  # Command prefix for bot commands
+  command_prefix: "/"
+
+# LLM API settings
+llm:
+  # API settings
+  api:
+    # URL for the LLM API (Ollama, KoboldCPP, etc.)
+    url: "http://localhost:11434/api/chat"
+    # API key (if required)
+    key: ""
+    # API type (options: "ollama", "koboldcpp", "openai")
+    type: "ollama"
+    # Model name 
+    model: "llama3"
+    
+    # Alternative OpenAI settings (uncomment to use)
+    # url: "https://api.openai.com/v1/chat/completions"
+    # key: "your-openai-api-key"
+    # type: "openai"
+    # model: "gpt-3.5-turbo"
+    
+    # Alternative Kobold CPP settings (uncomment to use)
+    # url: "http://localhost:5001/api/v1/generate"
+    # type: "koboldcpp"
+  
+  # Message settings
+  message:
+    # Maximum context length (in tokens)
+    max_context_length: 4096
+    # Maximum response length (in tokens)
+    max_length: 800
+    # Temperature (randomness)
+    temperature: 0.7
+    # Top p (nucleus sampling)
+    top_p: 0.9
+    # Whether to stream responses
+    stream: true
+
+# Character settings
+character:
+  # Path to character.json file
+  path: "character.json" 
