@@ -11,24 +11,10 @@ discord:
 llm:
   # API settings
   api:
-    # URL for the LLM API (Ollama, KoboldCPP, etc.)
+    # URL for the Ollama API
     url: "http://localhost:11434/api/chat"
-    # API key (if required)
-    key: ""
-    # API type (options: "ollama", "koboldcpp", "openai")
-    type: "ollama"
-    # Model name 
+    # Model name to use with Ollama
     model: "llama3"
-    
-    # Alternative OpenAI settings (uncomment to use)
-    # url: "https://api.openai.com/v1/chat/completions"
-    # key: "your-openai-api-key"
-    # type: "openai"
-    # model: "gpt-3.5-turbo"
-    
-    # Alternative Kobold CPP settings (uncomment to use)
-    # url: "http://localhost:5001/api/v1/generate"
-    # type: "koboldcpp"
   
   # Message settings
   message:

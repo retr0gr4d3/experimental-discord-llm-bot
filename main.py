@@ -77,6 +77,25 @@ async def on_message(message):
     if is_mention or is_reply:
         await process_llm_query(message)
 
+def create_error_embed():
+    """Create an error embed for Ollama connection issues"""
+    embed = discord.Embed(
+        title="Brain Malfunction",
+        description="I'm having problems thinking right now. Please ask Retr0gr4d3 to slap me and wake me up!",
+        color=discord.Color.red()
+    )
+    embed.set_footer(
+        text="made by retr0gr4d3",
+        icon_url="https://cdn.discordapp.com/emojis/754736642761424946.png" # Optional: you can replace with an actual icon URL if desired
+    )
+    # Add clickable link in the footer
+    embed.add_field(
+        name="Website",
+        value="[retr0.gr4d3.uk](https://retr0.gr4d3.uk)",
+        inline=False
+    )
+    return embed
+
 async def process_llm_query(message):
     """Process a message as an LLM query"""
     channel_id = str(message.channel.id)
@@ -100,6 +119,15 @@ async def process_llm_query(message):
         
         # Query LLM
         response_text = llm_interface.query_llm(channel_id, user_message)
+        
+        # Check if it's an error message
+        if response_text.startswith("ERROR:"):
+            # Create and send error embed
+            embed = create_error_embed()
+            bot_message = await message.reply(embed=embed)
+            
+            # Don't store error responses in history
+            return
         
         # Split message if too long (Discord has a 2000 character limit)
         if len(response_text) > 2000:

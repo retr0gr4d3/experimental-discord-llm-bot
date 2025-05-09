@@ -60,80 +60,15 @@ class LLMInterface:
             }
         }
     
-    def _build_koboldcpp_payload(self, channel_id: str, user_message: str) -> Dict[str, Any]:
-        """Build payload for KoboldCPP API"""
-        system_prompt = self._get_system_prompt()
-        
-        # Format prompt for KoboldCPP
-        prompt = f"{system_prompt}\n\n"
-        
-        for msg in self.get_conversation_history(channel_id):
-            if msg.role == "user":
-                prompt += f"User: {msg.content}\n"
-            elif msg.role == "assistant":
-                prompt += f"Assistant: {msg.content}\n"
-        
-        prompt += f"User: {user_message}\nAssistant:"
-        
-        return {
-            "prompt": prompt,
-            "max_length": self.message_config['max_length'],
-            "temperature": self.message_config['temperature'],
-            "top_p": self.message_config['top_p'],
-            "stream": self.message_config['stream']
-        }
-    
-    def _build_openai_payload(self, channel_id: str, user_message: str) -> Dict[str, Any]:
-        """Build payload for OpenAI-compatible API"""
-        system_prompt = self._get_system_prompt()
-        
-        messages = [{"role": "system", "content": system_prompt}]
-        
-        for msg in self.get_conversation_history(channel_id):
-            messages.append({"role": msg.role, "content": msg.content})
-        
-        messages.append({"role": "user", "content": user_message})
-        
-        return {
-            "model": self.api_config['model'],
-            "messages": messages,
-            "temperature": self.message_config['temperature'],
-            "max_tokens": self.message_config['max_length'],
-            "top_p": self.message_config['top_p'],
-            "stream": self.message_config['stream']
-        }
-    
-    def _get_api_headers(self) -> Dict[str, str]:
-        """Get headers for API request"""
-        headers = {
-            "Content-Type": "application/json"
-        }
-        
-        # Add API key if configured
-        if self.api_config['key']:
-            if self.api_config['type'] == 'openai':
-                headers["Authorization"] = f"Bearer {self.api_config['key']}"
-            else:
-                headers["x-api-key"] = self.api_config['key']
-        
-        return headers
-    
     def query_llm(self, channel_id: str, user_message: str) -> str:
         """Query LLM API with user message and return response"""
         api_url = self.api_config['url']
-        api_type = self.api_config['type']
         
-        # Build payload based on API type
-        if api_type == 'ollama':
-            payload = self._build_ollama_payload(channel_id, user_message)
-        elif api_type == 'koboldcpp':
-            payload = self._build_koboldcpp_payload(channel_id, user_message)
-        elif api_type == 'openai':
-            payload = self._build_openai_payload(channel_id, user_message)
-        else:
-            raise ValueError(f"Unsupported API type: {api_type}")
+        # Build Ollama payload
+        payload = self._build_ollama_payload(channel_id, user_message)
         
-        headers = self._get_api_headers()
+        # Standard headers
+        headers = {"Content-Type": "application/json"}
         
         # Make API request
         try:
@@ -142,62 +77,58 @@ class LLMInterface:
             
             # Handle streaming response
             if self.message_config['stream']:
-                return self._handle_streaming_response(response, api_type)
+                return self._handle_streaming_response(response)
             
             # Handle non-streaming response
-            return self._handle_non_streaming_response(response, api_type)
+            return self._handle_non_streaming_response(response)
             
         except requests.exceptions.RequestException as e:
-            print(f"Error querying LLM API: {e}")
-            return "I'm sorry, I'm having trouble connecting to my language model right now. Please try again later."
+            print(f"Error querying Ollama API: {e}")
+            
+            error_details = ""
+            if hasattr(e, 'response') and e.response is not None:
+                status_code = e.response.status_code
+                if status_code == 404:
+                    error_details = " The API endpoint could not be found. Check if Ollama is running and available at the URL in config.yaml."
+                elif status_code == 400:
+                    error_details = " Bad request. Check if your model name is correct."
+                elif status_code == 500:
+                    error_details = " Ollama server error. Check the Ollama logs for details."
+            
+            # Return error message with special prefix to indicate it's an error
+            return "ERROR:CONNECTION"
     
-    def _handle_streaming_response(self, response, api_type: str) -> str:
-        """Handle streaming API response"""
+    def _handle_streaming_response(self, response) -> str:
+        """Handle streaming API response from Ollama"""
         full_response = ""
         
         for line in response.iter_lines():
             if line:
-                if api_type == 'ollama':
-                    try:
-                        json_line = json.loads(line)
-                        if 'message' in json_line and 'content' in json_line['message']:
-                            chunk = json_line['message']['content']
-                            full_response += chunk
-                    except json.JSONDecodeError:
-                        continue
-                elif api_type == 'openai':
-                    try:
-                        # Skip "data: " prefix
-                        if line.startswith(b'data: '):
-                            line = line[6:]
-                        if line.strip() == b'[DONE]':
-                            continue
-                        json_line = json.loads(line)
-                        if 'choices' in json_line and len(json_line['choices']) > 0:
-                            delta = json_line['choices'][0].get('delta', {})
-                            if 'content' in delta:
-                                full_response += delta['content']
-                    except json.JSONDecodeError:
-                        continue
-                elif api_type == 'koboldcpp':
-                    try:
-                        json_line = json.loads(line)
-                        if 'token' in json_line:
-                            full_response += json_line['token']
-                    except json.JSONDecodeError:
-                        continue
+                try:
+                    json_line = json.loads(line)
+                    if 'message' in json_line and 'content' in json_line['message']:
+                        chunk = json_line['message']['content']
+                        full_response += chunk
+                except json.JSONDecodeError:
+                    continue
+        
+        if not full_response:
+            return "ERROR:EMPTY_RESPONSE"
         
         return full_response
     
-    def _handle_non_streaming_response(self, response, api_type: str) -> str:
-        """Handle non-streaming API response"""
-        json_response = response.json()
-        
-        if api_type == 'ollama':
-            return json_response.get('message', {}).get('content', '')
-        elif api_type == 'openai':
-            return json_response.get('choices', [{}])[0].get('message', {}).get('content', '')
-        elif api_type == 'koboldcpp':
-            return json_response.get('results', [{}])[0].get('text', '')
-        
-        return "" 
+    def _handle_non_streaming_response(self, response) -> str:
+        """Handle non-streaming API response from Ollama"""
+        try:
+            json_response = response.json()
+            content = json_response.get('message', {}).get('content', '')
+            
+            if not content:
+                print(f"Warning: Empty response from Ollama API: {json_response}")
+                return "ERROR:EMPTY_RESPONSE"
+            
+            return content
+            
+        except json.JSONDecodeError:
+            print(f"Error parsing JSON response: {response.text}")
+            return "ERROR:PARSE" 

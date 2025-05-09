@@ -1,6 +1,6 @@
 # Discord LLM Bot
 
-A Discord bot that interfaces with an LLM hosted via an OpenAI-compatible API (like Ollama or KoboldCPP).
+A Discord bot that interfaces with [Ollama](https://ollama.com/) to provide LLM-powered chat capabilities.
 
 ## Setup
 
@@ -9,12 +9,17 @@ A Discord bot that interfaces with an LLM hosted via an OpenAI-compatible API (l
    ```
    pip install -r requirements.txt
    ```
-3. Create a `.env` file with your Discord bot token and other configuration:
+3. Create a `.env` file with your Discord bot token:
    ```
    DISCORD_TOKEN=your_discord_bot_token
    ```
-4. Configure the `config.yaml` file with your LLM API settings
-5. Run the bot:
+4. Install Ollama from [ollama.com](https://ollama.com/)
+5. Pull a model with Ollama:
+   ```
+   ollama pull llama3
+   ```
+6. Configure the `config.yaml` file if needed (e.g., to change model)
+7. Run the bot:
    ```
    python main.py
    ```
@@ -33,11 +38,19 @@ If you encounter SSL certificate verification errors on macOS, you have two opti
 ## Features
 
 - Chat with an LLM by tagging the bot or replying to its messages
-- Configurable LLM endpoint (Ollama, KoboldCPP, etc.)
-- Customizable bot personality via character.json
+- Configurable bot personality via character.json
+- Supports all models available in Ollama
 
 ## Usage
 
 - Tag the bot: `@BotName Hello there!`
 - Reply to a message from the bot
-- Use the `/help` command for more information 
+- Use the `/help` command for more information
+
+## Troubleshooting
+
+If you have issues connecting to Ollama:
+
+1. Make sure Ollama is installed and running
+2. Verify the model exists in Ollama with `ollama list`  
+3. Check the connection with `python test_llm_connection.py` 
