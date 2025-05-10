@@ -146,35 +146,39 @@ class LLMInterface:
         if api_type == 'koboldcpp':
             # Handle OpenAI-compatible streaming response
             for line in response.iter_lines():
-                if line:
-                    try:
-                        line_text = line.decode('utf-8')
-                        if line_text.startswith('data: '):
-                            line_text = line_text[6:]  # Remove 'data: ' prefix
-                            if line_text.strip() == '[DONE]':
-                                continue
-                            
-                            json_line = json.loads(line_text)
-                            if 'choices' in json_line and len(json_line['choices']) > 0:
-                                delta = json_line['choices'][0].get('delta', {})
-                                if 'content' in delta:
-                                    chunk = delta['content']
-                                    full_response += chunk
-                    except json.JSONDecodeError:
-                        continue
-                    except Exception as e:
-                        print(f"Error parsing streaming response: {e}")
+                if not line:
+                    continue
+                
+                try:
+                    line_text = line.decode('utf-8')
+                    if line_text.startswith('data: '):
+                        line_text = line_text[6:]  # Remove 'data: ' prefix
+                        if line_text.strip() == '[DONE]':
+                            continue
+                        
+                        json_line = json.loads(line_text)
+                        if 'choices' in json_line and len(json_line['choices']) > 0:
+                            delta = json_line['choices'][0].get('delta', {})
+                            if 'content' in delta:
+                                chunk = delta['content']
+                                full_response += chunk
+                except json.JSONDecodeError:
+                    continue
+                except Exception as e:
+                    print(f"Error parsing streaming response: {e}")
         else:
             # Handle Ollama streaming response
             for line in response.iter_lines():
-                if line:
-                    try:
-                        json_line = json.loads(line)
-                        if 'message' in json_line and 'content' in json_line['message']:
-                            chunk = json_line['message']['content']
-                            full_response += chunk
-                    except json.JSONDecodeError:
-                        continue
+                if not line:
+                    continue
+                
+                try:
+                    json_line = json.loads(line)
+                    if 'message' in json_line and 'content' in json_line['message']:
+                        chunk = json_line['message']['content']
+                        full_response += chunk
+                except json.JSONDecodeError:
+                    continue
         
         if not full_response:
             return "ERROR:EMPTY_RESPONSE"
@@ -211,4 +215,4 @@ class LLMInterface:
             
         except json.JSONDecodeError:
             print(f"Error parsing JSON response: {response.text}")
-            return "ERROR:PARSE"
+            return "ERROR:PARSE" 
