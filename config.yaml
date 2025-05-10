@@ -11,10 +11,21 @@ discord:
 llm:
   # API settings
   api:
+    # API type (ollama or koboldcpp)
+    type: "ollama"
+    
+    # Ollama settings (used when type is "ollama")
     # URL for the Ollama API
     url: "http://localhost:11434/api/chat"
     # Model name to use with Ollama
     model: "llama3"
+    
+    # Koboldcpp settings (used when type is "koboldcpp")
+    # koboldcpp_url: "http://localhost:5001/v1"
+    # API key for Koboldcpp (can be left blank if not set)
+    # koboldcpp_api_key: ""
+    # Model name to use with Koboldcpp
+    # koboldcpp_model: "llama3"
   
   # Message settings
   message:
