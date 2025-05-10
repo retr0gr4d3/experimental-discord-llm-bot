@@ -21,11 +21,12 @@ llm:
     model: "llama3"
     
     # Koboldcpp settings (used when type is "koboldcpp")
-    # koboldcpp_url: "http://localhost:5001/v1"
+    # URL for the Koboldcpp API
+    koboldcpp_url: "http://localhost:5001/v1"
     # API key for Koboldcpp (can be left blank if not set)
-    # koboldcpp_api_key: ""
+    koboldcpp_api_key: ""
     # Model name to use with Koboldcpp
-    # koboldcpp_model: "llama3"
+    koboldcpp_model: "llama3"
   
   # Message settings
   message:

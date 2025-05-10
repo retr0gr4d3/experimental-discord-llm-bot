@@ -102,12 +102,12 @@ class LLMInterface:
         else:
             # Default to Ollama
             api_url = self.api_config['url']
-        
-        # Build Ollama payload
-        payload = self._build_ollama_payload(channel_id, user_message)
-        
-        # Standard headers
-        headers = {"Content-Type": "application/json"}
+            
+            # Build Ollama payload
+            payload = self._build_ollama_payload(channel_id, user_message)
+            
+            # Standard headers
+            headers = {"Content-Type": "application/json"}
         
         # Make API request
         try:
@@ -166,15 +166,15 @@ class LLMInterface:
                         print(f"Error parsing streaming response: {e}")
         else:
             # Handle Ollama streaming response
-        for line in response.iter_lines():
-            if line:
-                try:
-                    json_line = json.loads(line)
-                    if 'message' in json_line and 'content' in json_line['message']:
-                        chunk = json_line['message']['content']
-                        full_response += chunk
-                except json.JSONDecodeError:
-                    continue
+            for line in response.iter_lines():
+                if line:
+                    try:
+                        json_line = json.loads(line)
+                        if 'message' in json_line and 'content' in json_line['message']:
+                            chunk = json_line['message']['content']
+                            full_response += chunk
+                    except json.JSONDecodeError:
+                        continue
         
         if not full_response:
             return "ERROR:EMPTY_RESPONSE"
@@ -199,16 +199,16 @@ class LLMInterface:
             else:
                 # Handle Ollama non-streaming response
                 content = json_response.get('message', {}).get('content', '')
-            
-            if not content:
-                print(f"Warning: Empty response from Ollama API: {json_response}")
-                return "ERROR:EMPTY_RESPONSE"
-            
-            return content
+                
+                if not content:
+                    print(f"Warning: Empty response from Ollama API: {json_response}")
+                    return "ERROR:EMPTY_RESPONSE"
+                
+                return content
             
             print(f"Warning: Unexpected response format: {json_response}")
             return "ERROR:UNKNOWN_FORMAT"
             
         except json.JSONDecodeError:
             print(f"Error parsing JSON response: {response.text}")
-            return "ERROR:PARSE" 
+            return "ERROR:PARSE"

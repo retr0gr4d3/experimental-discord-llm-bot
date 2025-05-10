@@ -85,4 +85,4 @@ If you have issues connecting to your LLM backend:
 3. Check the connection with the appropriate test script:
    - For Ollama: `python test_llm_connection.py`
    - For Koboldcpp: `python test_koboldcpp.py`
-4. Verify API URL and key in config.yaml 
+4. Verify API URL and key in config.yaml

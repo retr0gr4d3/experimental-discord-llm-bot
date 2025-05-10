@@ -94,4 +94,4 @@ if __name__ == "__main__":
         api_key = sys.argv[2]
     
     # Test connection
-    test_koboldcpp_connection(url, api_key) 
+    test_koboldcpp_connection(url, api_key)
